@@ -3,7 +3,6 @@ import {
   SearchBar,
   SearchForm,
   SearchFormButton,
-  ButtonLabel,
   SearchFormInput,
 } from './Searchbar.styled';
 import { TfiSearch } from 'react-icons/tfi';

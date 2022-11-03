@@ -34,7 +34,7 @@ export class App extends Component {
       }
 
       if (!gallery.totalHits) {
-        return toast.error(
+        toast.error(
           'Sorry, there are no images matching your search query. Please try again.'
         );
       } else {
@@ -45,7 +45,7 @@ export class App extends Component {
       }
     } catch {
       this.setState({
-        errorMessage: 'Oops, something is wrong, please try again',
+        messageError: 'Something is wrong, please try again',
       });
     } finally {
       this.setState({ isLoading: false });

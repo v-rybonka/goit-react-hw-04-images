@@ -38,7 +38,7 @@ export class Searchbar extends Component {
             value={this.state.search}
             onChange={this.hendleInputChange}
             autocomplete="off"
-            autofocus
+            autoFocus
             placeholder="Search images and photos"
           />
         </SearchForm>

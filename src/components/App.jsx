@@ -1,99 +1,82 @@
-import { Component } from 'react';
+import { useState,useEffect } from 'react';
 import { fetchArticles } from 'services/imageApiService';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Wrap, ErrorMessage } from './App.styled';
-import React from 'react';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import React from 'react';
 import { Searchbar } from './Searchbar/Searchbar';
 import { Button } from './Button/Button';
 import { Loader } from './Loader/Loader';
+import { Toast } from './Loader/Toast'
 
-export class App extends Component {
-  state = {
-    images: [],
-    query: '',
-    page: 1,
-    messageError: null,
-    isLoading: false,
-    total: 0,
-  };
 
-  createGallery = async (query, page) => {
+export const App = () => {
+  const [images, setImages] = useState([])
+  const [query, setQuery] = useState('')
+  const [page, setPage] = useState(1)
+  const [messageError, setMessageError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [total, setTotal] = useState(0)
+  
+  
+
+  const createGallery = async (query, page) => {
     try {
-      this.setState({ isLoading: true });
-
+      setIsLoading(true);
+      
       const gallery = await fetchArticles(query, page);
 
       if (!gallery.hits) {
-        throw new Error('Error');
+        toast.warn('Images was not found');
+        return;
       }
-
-      if (gallery.totalHits !== 0 && !this.state.images.length) {
+      
+      if(page === 1){
         toast.success(`Hooray! We found ${gallery.totalHits} images.`);
+      setTotal(gallery.totalHits)
       }
 
       if (!gallery.totalHits) {
         toast.error(
           'Sorry, there are no images matching your search query. Please try again.'
         );
-      } else {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...gallery.hits],
-          total: gallery.totalHits,
-        }));
-      }
+      } 
+        setImages(prevState =>[...prevState, ...gallery.hits]);
+      
     } catch {
-      this.setState({
-        messageError: 'Something is wrong, please try again',
-      });
+      setMessageError( 'Something is wrong, please try again');
     } finally {
-      this.setState({ isLoading: false });
+      setIsLoading( false );
     }
   };
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.page !== this.state.page ||
-      prevState.query !== this.state.query
-    ) {
-      this.createGallery(this.state.query, this.state.page);
+  useEffect(() => {
+    if (!query) { 
+      return;
     }
-  }
+    createGallery(query, page)
+  },[query, page])
+  
 
-  handleFormSubmit = query => {
-    this.setState({
-      query: query,
-      page: 1,
-      total: 0,
-      images: [],
-    });
+  const handleFormSubmit = query => {
+    setQuery(query)
+    setPage(1)
+    setTotal(0)
+    setImages([])
+  
   };
-  loadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+   const loadMore = () => {
+    setPage(state => ( state + 1 ));
   };
-  render() {
-    const { total, images, isLoading, messageError } = this.state;
+  
     return (
       <Wrap>
-        <Searchbar onSubmit={this.handleFormSubmit} />
+        <Searchbar onSubmit={handleFormSubmit} />
         {messageError && <ErrorMessage>{messageError}</ErrorMessage>}
         <ImageGallery images={images} />
         {isLoading && <Loader />}
-        <ToastContainer
-          position="top-right"
-          autoClose={2000}
-          limit={2}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="colored"
-        />
-        {total > images.length && <Button onLoadMore={this.loadMore} />}
+        <Toast/>
+        {total > images.length && !isLoading&& <Button onLoadMore={loadMore} />}
       </Wrap>
     );
   }
-}

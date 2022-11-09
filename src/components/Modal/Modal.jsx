@@ -1,38 +1,38 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import { useEffect } from 'react';
 import { WrapModal, ModalWindow } from './Modal.styled';
-export class Modal extends Component {
-  componentDidMount() {
-    window.addEventListener('keydown', this.OnClickEsc);
-  }
 
-  componentWillUnmount() {
-    window.removeEventListener('keydown', this.OnClickEsc);
-  }
 
-  OnClickEsc = evt => {
+export const Modal=({image, alt, onClose}) => {
+  
+  useEffect(() => {
+   const OnClickEsc = evt => {
     if (evt.code === 'Escape') {
-      this.props.onClose();
+      onClose();
     }
-  };
+   };
+    window.addEventListener('keydown', OnClickEsc);
+    return () => {
+      window.removeEventListener('keydown', OnClickEsc);
+    }
+}, [onClose])
+ 
 
-  onBackdropClick = evt => {
+  const onBackdropClick = evt => {
     if (evt.target === evt.currentTarget) {
-      this.props.onClose();
+      onClose();
     }
   };
 
-  render() {
-    const { image, alt } = this.props;
+  
     return (
-      <WrapModal onClick={this.onBackdropClick}>
+      <WrapModal onClick={onBackdropClick}>
         <ModalWindow>
           <img src={image} alt={alt} />
         </ModalWindow>
       </WrapModal>
     );
   }
-}
 Modal.propTypes = {
   image: PropTypes.string.isRequired,
   alt: PropTypes.string.isRequired,

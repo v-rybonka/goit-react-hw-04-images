@@ -1,4 +1,4 @@
-import { Component } from 'react';
+
 import {
   SearchBar,
   SearchForm,
@@ -6,28 +6,28 @@ import {
   SearchFormInput,
 } from './Searchbar.styled';
 import { TfiSearch } from 'react-icons/tfi';
+import { useState } from 'react';
 
-export class Searchbar extends Component {
-  state = {
-    search: '',
+export const Searchbar = ({ onSubmit }) => {
+  const [search, setSearch]= useState('')
+  
+ const hendleInputChange = evt => {
+   setSearch( evt.currentTarget.value.trim().toLowerCase());
   };
-  hendleInputChange = evt => {
-    this.setState({ search: evt.currentTarget.value.toLowerCase() });
-  };
-  hendleSubmit = evt => {
+  const hendleSubmit = evt => {
     evt.preventDefault();
 
-    if (this.state.search.trim() === '') {
+    if (!search) {
       alert('Enter data to search!');
       return;
     }
-    this.props.onSubmit(this.state.search);
-    this.setState({ search: '' });
+    onSubmit(search);
+    setSearch('');
   };
-  render() {
+  
     return (
       <SearchBar>
-        <SearchForm onSubmit={this.hendleSubmit}>
+        <SearchForm onSubmit={hendleSubmit}>
           <SearchFormButton type="submit">
             <TfiSearch />
           </SearchFormButton>
@@ -35,8 +35,8 @@ export class Searchbar extends Component {
           <SearchFormInput
             type="text"
             name="search"
-            value={this.state.search}
-            onChange={this.hendleInputChange}
+            value={search}
+            onChange={hendleInputChange}
             autocomplete="off"
             autoFocus
             placeholder="Search images and photos"
@@ -45,4 +45,4 @@ export class Searchbar extends Component {
       </SearchBar>
     );
   }
-}
+

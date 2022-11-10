@@ -27,6 +27,7 @@ export const ImageGalleryItem = ( {image} ) => {
             />
           )}
         </GalleryItem>
+      
       </>
     );
   }
